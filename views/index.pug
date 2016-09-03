@@ -1,0 +1,22 @@
+extends layout.pug
+
+block content
+  form(
+    method='get'
+    action='/'
+  )
+    input(
+      name='url'
+      type='text'
+      placeholder='givemeaport.com'
+      value=defaultUrl
+      onfocus='this.select()'
+      autofocus
+      required
+    )
+
+  h1 Select One You Like:
+
+  -
+  each item in ports
+    p= `${item.algorithm}: ${item.port}`
