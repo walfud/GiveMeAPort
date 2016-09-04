@@ -17,6 +17,11 @@ block content
 
   h1 Select One You Like:
 
-  -
-  each item in ports
-    p= `${item.algorithm}: ${item.port}`
+  each port in ports
+    - tip= `${port.algorithm}: ${port.port}`
+    if !port.isReserved
+      p
+        = tip
+    else
+      p
+        s= tip
