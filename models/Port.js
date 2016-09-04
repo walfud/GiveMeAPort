@@ -1,91 +1,86 @@
 const db = require('../utils/db');
 const async = require('async');
+const moment = require('moment');
 
 class Port {
-    constructor(_id, port, algorithm, isSystem, isCommon) {
-        this._id = _id;
-        this.port = port;
-        this.algorithm = algorithm;
-        this.isSystem = isSystem;
-        this.isCommon = isCommon;
+    constructor() {
+        this._id = null;
+        this.algorithm = null;
+        this.port = null;
+        this.isSystem = null;
+        this.isCommon = null;
+        this.timestamp = null;
     }
 
     static generate(url, cb) {
-        if (!url) {
-            cb(null, null);
-        }
+        async.concat([add, multiple, xor, random], (algorithm, callback) => {
+            console.log(`${algorithm.name}<<<`);
 
-        async.series({
-            add: (callback) => {
-                console.log('add<<<');
+            let port = new Port();
+            port.algorithm = algorithm.name;
+            port.timestamp = moment.utc().valueOf();
+            algorithm(url, (err, portValue) => {
+                console.log(`${algorithm.name}>>>`);
 
-                let port = new Port(undefined, null, 'add', false, false);
-                if (url) {
-                    port.port = 0;
-                    for (const c of url) {
-                        port.port += c.charCodeAt();
-                        port.port %= 65536;
-                        console.log(`${c.charCodeAt()} => ${port.port}`);
-                    }
-                }
-                callback(null, port);
-
-                console.log('add>>>');
-            },
-            multiple: (callback) => {
-                console.log('multiple<<<');
-
-                let port = new Port(undefined, null, 'multiple', false, false);
-                if (url) {
-                    port.port = 1;
-                    for (const c of url) {
-                        port.port *= c.charCodeAt();
-                        port.port = (port.port % 65535) + 1;
-                        console.log(`${c.charCodeAt()} => ${port.port}`);
-                    }
-                }
-                callback(null, port);
-
-                console.log('multiple>>>');
-            },
-            xor: (callback) => {
-                console.log('xor<<<');
-
-                let port = new Port(undefined, null, 'xor', false, false);
-                if (url) {
-                    port.port = 0;
-                    for (const c of url) {
-                        port.port ^= c.charCodeAt();
-                        console.log(`${c.charCodeAt()} => ${port.port}`);
-                    }
-                }
-                callback(null, port);
-
-                console.log('xor>>>');
-            },
-            random: (callback) => {
-                const port = Math.round(65535 * Math.random());
-                callback(null, new Port(undefined, port, 'random', false, false));
-
-                console.log(`random<<<\n${port}random>>>`);
-            },
-        }, (err, ports) => {
-            async.concatSeries(ports, (port, callback) => {
-                async.eachSeries([isSystem, isCommon], (checker, callback) => {
-                    checker(port.port, (err, reserved) => {
+                port.port = portValue;
+                async.each([isSystem, isCommon], (checker, callback) => {
+                    checker(portValue, (err, reserved) => {
                         port[checker.name] = reserved;
                         callback();
                     });
                 }, (err) => {
                     callback(err, port);
                 });
-            }, (err, ports) => {
-                cb(err, ports);
             });
+        }, (err, ports) => {
+            cb(err, ports);
         });
     }
 }
 
+// Algorithm
+function add(url, cb) {
+    let port = 0;
+    if (url) {
+        for (const c of url) {
+            port += c.charCodeAt();
+            port %= 65536;
+            console.log(`${c.charCodeAt()} => ${port}`);
+        }
+    }
+    cb(null, port);
+}
+
+function multiple(url, cb) {
+    let port = 1
+    if (url) {
+        for (const c of url) {
+            port *= c.charCodeAt();
+            port = (port % 65535) + 1;
+            console.log(`${c.charCodeAt()} => ${port}`);
+        }
+    }
+    cb(null, port);
+}
+
+function xor(url, cb) {
+    let port = 0;
+    if (url) {
+        for (const c of url) {
+            port ^= c.charCodeAt();
+            console.log(`${c.charCodeAt()} => ${port}`);
+        }
+    }
+    cb(null, port);
+}
+
+function random(url, cb) {
+    const port = Math.round(65535 * Math.random());
+    console.log(port);
+    cb(null, port);
+}
+
+// Checker
 function isSystem(port, cb) {
     cb(null, 0 <= port && port < 1024 ? true : false);
 }
