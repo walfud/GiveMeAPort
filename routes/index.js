@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 const Port = require('../models/Port');
-const util = require('util');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {

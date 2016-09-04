@@ -1,4 +1,5 @@
 const db = require('../utils/db');
+const CommonPort = require('./CommonPort');
 const async = require('async');
 const moment = require('moment');
 
@@ -86,8 +87,9 @@ function isSystem(port, cb) {
 }
 
 function isCommon(port, cb) {
-    // cb(null, commonPort.has(port) ? true : false);
-    cb(null, false);
+    CommonPort.has(port, (err, commonPort) => {
+        cb(null, commonPort ? true : false);
+    });
 }
 
 module.exports = Port;
