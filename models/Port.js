@@ -19,56 +19,53 @@ class Port {
             add: (callback) => {
                 console.log('add<<<');
 
+                let port = new Port(undefined, null, 'add', false, false);
                 if (url) {
-                    let port = 0;
+                    port.port = 0;
                     for (const c of url) {
-                        port += c.charCodeAt();
-                        port %= 65536;
-                        console.log(`${c.charCodeAt()} => ${port}`);
+                        port.port += c.charCodeAt();
+                        port.port %= 65536;
+                        console.log(`${c.charCodeAt()} => ${port.port}`);
                     }
-                    callback(null, new Port(undefined, port, 'add', false, false));
-                } else {
-                    callback(null, new Port(undefined, null, 'add', false, false));
                 }
+                callback(null, port);
 
                 console.log('add>>>');
             },
             multiple: (callback) => {
                 console.log('multiple<<<');
 
+                let port = new Port(undefined, null, 'multiple', false, false);
                 if (url) {
-                    let port = 1;
+                    port.port = 1;
                     for (const c of url) {
-                        port *= c.charCodeAt();
-                        port = (port % 65535) + 1;
-                        console.log(`${c.charCodeAt()} => ${port}`);
+                        port.port *= c.charCodeAt();
+                        port.port = (port.port % 65535) + 1;
+                        console.log(`${c.charCodeAt()} => ${port.port}`);
                     }
-                    callback(null, new Port(undefined, port, 'multiple', false, false));
-                } else {
-                    callback(null, new Port(undefined, null, 'multiple', false, false));
                 }
+                callback(null, port);
 
                 console.log('multiple>>>');
             },
             xor: (callback) => {
                 console.log('xor<<<');
 
+                let port = new Port(undefined, null, 'xor', false, false);
                 if (url) {
-                    let port = null;
+                    port.port = 0;
                     for (const c of url) {
-                        port ^= c.charCodeAt();
-                        console.log(`${c.charCodeAt()} => ${port}`);
+                        port.port ^= c.charCodeAt();
+                        console.log(`${c.charCodeAt()} => ${port.port}`);
                     }
-                    callback(null, new Port(undefined, port, 'xor', false, false));
-                } else {
-                    callback(null, new Port(undefined, null, 'xor', false, false));
                 }
+                callback(null, port);
 
                 console.log('xor>>>');
             },
             random: (callback) => {
                 const port = Math.round(65535 * Math.random());
-                callback(null, new Port(undefined, port, 'random', false, false));
+                callback(null, new Port(undefined, null, 'random', false, false));
 
                 console.log(`xor<<<\n${port}xor>>>`);
             },
