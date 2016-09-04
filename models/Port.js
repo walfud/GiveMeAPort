@@ -65,14 +65,34 @@ class Port {
             },
             random: (callback) => {
                 const port = Math.round(65535 * Math.random());
-                callback(null, new Port(undefined, null, 'random', false, false));
+                callback(null, new Port(undefined, port, 'random', false, false));
 
-                console.log(`xor<<<\n${port}xor>>>`);
+                console.log(`random<<<\n${port}random>>>`);
             },
         }, (err, ports) => {
-            cb(err, ports);
+            async.concatSeries(ports, (port, callback) => {
+                async.eachSeries([isSystem, isCommon], (checker, callback) => {
+                    checker(port.port, (err, reserved) => {
+                        port[checker.name] = reserved;
+                        callback();
+                    });
+                }, (err) => {
+                    callback(err, port);
+                });
+            }, (err, ports) => {
+                cb(err, ports);
+            });
         });
     }
+}
+
+function isSystem(port, cb) {
+    cb(null, 0 <= port && port < 1024 ? true : false);
+}
+
+function isCommon(port, cb) {
+    // cb(null, commonPort.has(port) ? true : false);
+    cb(null, false);
 }
 
 module.exports = Port;

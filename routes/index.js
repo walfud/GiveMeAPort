@@ -8,6 +8,7 @@ router.get('/', function(req, res, next) {
     const url = req.query.url;
 
     Port.generate(url, (err, ports) => {
+      console.dir(ports);
         res.render('index', {
             defaultUrl: url,
             ports: ports,
