@@ -40,7 +40,7 @@ class Port {
                     let port = 1;
                     for (const c of url) {
                         port *= c.charCodeAt();
-                        port %= 65536;
+                        port = (port % 65535) + 1;
                         console.log(`${c.charCodeAt()} => ${port}`);
                     }
                     callback(null, new Port(undefined, port, 'multiple', false, false));
