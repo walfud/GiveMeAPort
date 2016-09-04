@@ -1,5 +1,5 @@
 const db = require('../utils/db');
-const CommonPort = require('./CommonPort');
+const ReservedPort = require('./ReservedPort');
 const async = require('async');
 const moment = require('moment');
 
@@ -8,8 +8,8 @@ class Port {
         this._id = null;
         this.algorithm = null;
         this.port = null;
-        this.isSystem = null;
-        this.isCommon = null;
+        // this.isSystem = null;
+        this.isReserved = null;
         this.timestamp = null;
     }
 
@@ -24,7 +24,7 @@ class Port {
                 console.log(`${algorithm.name}>>>`);
 
                 port.port = portValue;
-                async.each([isSystem, isCommon], (checker, callback) => {
+                async.each([/*isSystem, */isReserved], (checker, callback) => {
                     checker(portValue, (err, reserved) => {
                         port[checker.name] = reserved;
                         callback();
@@ -85,13 +85,13 @@ function random(url, cb) {
 }
 
 // Checker
-function isSystem(port, cb) {
-    cb(null, 0 <= port && port < 1024 ? true : false);
-}
+// function isSystem(port, cb) {
+//     cb(null, 0 <= port && port < 1024 ? true : false);
+// }
 
-function isCommon(port, cb) {
-    CommonPort.has(port, (err, commonPort) => {
-        cb(null, commonPort ? true : false);
+function isReserved(port, cb) {
+    ReservedPort.has(port, (err, reservedPort) => {
+        cb(null, reservedPort ? true : false);
     });
 }
 
