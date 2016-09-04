@@ -41,8 +41,9 @@ class Port {
 
 // Algorithm
 function add(url, cb) {
-    let port = 0;
+    let port = null;
     if (url) {
+        port = 0;
         for (const c of url) {
             port += c.charCodeAt();
             port %= 65536;
@@ -53,8 +54,9 @@ function add(url, cb) {
 }
 
 function multiple(url, cb) {
-    let port = 1
+    let port = null;
     if (url) {
+        port = 1;
         for (const c of url) {
             port *= c.charCodeAt();
             port = (port % 65535) + 1;
@@ -65,8 +67,9 @@ function multiple(url, cb) {
 }
 
 function xor(url, cb) {
-    let port = 0;
+    let port = null;
     if (url) {
+        port = 0;
         for (const c of url) {
             port ^= c.charCodeAt();
             console.log(`${c.charCodeAt()} => ${port}`);
