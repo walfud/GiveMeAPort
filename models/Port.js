@@ -14,7 +14,7 @@ class Port {
     }
 
     static generate(url, cb) {
-        async.concat([add, multiple, xor, random], (algorithm, callback) => {
+        async.concat(algorithm, (algorithm, callback) => {
             console.log(`${algorithm.name}<<<`);
 
             let port = new Port();
@@ -40,54 +40,52 @@ class Port {
 }
 
 // Algorithm
-function add(url, cb) {
-    let port = null;
-    if (url) {
-        port = 0;
-        for (const c of url) {
-            port += c.charCodeAt();
-            port %= 65536;
-            console.log(`${c.charCodeAt()} => ${port}`);
-        }
-    }
-    cb(null, port);
+const algorithm = {
+  add: (url, cb) => {
+      let port = null;
+      if (url) {
+          port = 0;
+          for (const c of url) {
+              port += c.charCodeAt();
+              port %= 65536;
+              console.log(`${c.charCodeAt()} => ${port}`);
+          }
+      }
+      cb(null, port);
+  },
+
+  multiple: (url, cb) => {
+      let port = null;
+      if (url) {
+          port = 1;
+          for (const c of url) {
+              port *= c.charCodeAt();
+              port = (port % 65535) + 1;
+              console.log(`${c.charCodeAt()} => ${port}`);
+          }
+      }
+      cb(null, port);
+  },
+
+  xor: (url, cb) => {
+      let port = null;
+      if (url) {
+          port = 0;
+          for (const c of url) {
+              port ^= c.charCodeAt();
+              console.log(`${c.charCodeAt()} => ${port}`);
+          }
+      }
+      cb(null, port);
+  },
+
+  random: (url, cb) => {
+      const port = Math.round(65535 * Math.random());
+      console.log(port);
+      cb(null, port);
+  },
 }
 
-function multiple(url, cb) {
-    let port = null;
-    if (url) {
-        port = 1;
-        for (const c of url) {
-            port *= c.charCodeAt();
-            port = (port % 65535) + 1;
-            console.log(`${c.charCodeAt()} => ${port}`);
-        }
-    }
-    cb(null, port);
-}
-
-function xor(url, cb) {
-    let port = null;
-    if (url) {
-        port = 0;
-        for (const c of url) {
-            port ^= c.charCodeAt();
-            console.log(`${c.charCodeAt()} => ${port}`);
-        }
-    }
-    cb(null, port);
-}
-
-function random(url, cb) {
-    const port = Math.round(65535 * Math.random());
-    console.log(port);
-    cb(null, port);
-}
-
-// Checker
-// function isSystem(port, cb) {
-//     cb(null, 0 <= port && port < 1024 ? true : false);
-// }
 
 function isReserved(port, cb) {
     ReservedPort.has(port, (err, reservedPort) => {
