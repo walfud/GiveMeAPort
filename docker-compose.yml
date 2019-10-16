@@ -4,15 +4,22 @@ services:
   node:
     container_name: givemeaport
     image: node:12
-    volumes:
-      - ./:/GiveMeAPort
-    ports:
-      - "56865:3000"
-    working_dir: /GiveMeAPort
-    command: sh -c "npm i && npm start"
-    logging:
-      options:
-        max-size: "100m"
     cpus: 0.2
     mem_limit: 100m
     memswap_limit: 200m
+    logging:
+      options:
+        max-size: "100m"
+    networks:
+      - nginx
+    ports:
+      - "56865:3000"
+    volumes:
+      - ./:/GiveMeAPort
+    working_dir: /GiveMeAPort
+    command: sh -c "npm i && npm start"
+
+networks:
+  nginx:
+    name: nginx_default
+    external: true
